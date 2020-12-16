@@ -29,4 +29,24 @@ public class ErrorsTest {
     }
 
 
+    @Test
+    public void onErrorReturn() {
+        final Mono<Object> mono = Mono.error(new RuntimeException("Oups"))
+                .onErrorReturn("OK");
+
+        StepVerifier.create(mono).expectNext("TO_REPLACE")
+                .verifyComplete();
+    }
+
+
+    @Test
+    public void onErrorResume() {
+        final Mono<Object> mono = Mono.error(new RuntimeException("Oups"))
+                .onErrorResume(t -> Mono.just("OK"));
+
+        StepVerifier.create(mono).expectNext("TO_REPLACE")
+                .verifyComplete();
+    }
+
+
 }

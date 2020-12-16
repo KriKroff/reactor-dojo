@@ -1,9 +1,11 @@
 package com.github.krikroff.reactor.step1;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -52,6 +54,14 @@ public class CreationMonoTest {
         StepVerifier.create(mono)
                 .expectNext("hello")
                 .verifyComplete();
+    }
+    
+    @Test
+    public void nullIsForbidden() {
+        Assertions.assertThrows(NullPointerException.class, ()-> Mono.just(null));
+
+        StepVerifier.create(Mono.justOrEmpty(null)).verifyComplete();
+        StepVerifier.create(Mono.justOrEmpty(Optional.empty())).verifyComplete();
     }
 
 }

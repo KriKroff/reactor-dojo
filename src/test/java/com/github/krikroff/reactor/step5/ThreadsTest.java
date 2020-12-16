@@ -11,6 +11,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ThreadsTest {
 
@@ -37,16 +38,40 @@ public class ThreadsTest {
         assertEquals("", threadNames.get(1));
         assertEquals("", threadNames.get(2));
     }
+    
+    @Test
+    public void subscriptionBlocked() throws InterruptedException {
+        final long start = System.currentTimeMillis();
+        //current thread is called "main"
+        Mono.fromCallable(() -> {
+            Thread.sleep(1000); // Blocking Call
+            return atomicInteger.addAndGet(1);
+        }).subscribe();
 
+        assertTrue(System.currentTimeMillis() - start < 1000); // FAIL
+    }
 
+    @Test
+    public void subscriptionNotBlocked() {
+        final long start = System.currentTimeMillis();
+        //current thread is called "main"
+        Mono.fromCallable(() -> {
+            Thread.sleep(1000); // Blocking Call
+            return 1;
+        }).subscribeOn(Schedulers.boundedElastic())
+                .subscribe();
+
+        assertTrue(System.currentTimeMillis() - start < 1000); // Success
+    }
+    
     @Test
     public void subscriptionWithSubscribe() throws InterruptedException {
         CountDownLatch countDownLatch = new CountDownLatch(1);
-        
+
         //current thread is called "main"
         Mono.fromCallable(() -> {
             pushThread(1);
-            return atomicInteger.addAndGet(1);
+            return 1;
         })
                 .doOnNext(i -> pushThread(2))
                 .publishOn(Schedulers.newSingle("th1"))
@@ -58,14 +83,12 @@ public class ThreadsTest {
                     pushThread(5);
                     countDownLatch.countDown();
                 });
-        
+
         countDownLatch.await();
         assertEquals("", threadNames.get(0));
         assertEquals("", threadNames.get(1));
         assertEquals("", threadNames.get(2));
         assertEquals("", threadNames.get(3));
         assertEquals("", threadNames.get(4));
-
     }
-
 }

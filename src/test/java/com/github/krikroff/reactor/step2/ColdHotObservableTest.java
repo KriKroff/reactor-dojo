@@ -8,6 +8,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.github.krikroff.reactor.TestConst.TO_REPLACE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -16,17 +17,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ColdHotObservableTest {
 
     private AtomicInteger atomicInteger = new AtomicInteger(0);
-
-    @Test
-    public void hotOrColdObservableTest_withJust() {
-        Mono.just(atomicInteger.addAndGet(1));
-        assertTrue(atomicInteger.get() == TO_REPLACE);
-    }
     
     @Test
     public void hotOrColdObservableTest_withCallable() {
         Mono.fromCallable(() -> atomicInteger.addAndGet(1));
 
+        assertTrue(atomicInteger.get() == TO_REPLACE);
+    }
+
+    @Test
+    public void hotOrColdObservableTest_withJust() {
+        Mono.just(atomicInteger.addAndGet(1));
         assertTrue(atomicInteger.get() == TO_REPLACE);
     }
 

@@ -13,7 +13,7 @@ public class ErrorsTest {
     public void errorMono() {
         final Mono<Object> mono = Mono.error(new RuntimeException("Oups"));
 
-        StepVerifier.create(mono).expectErrorMessage("Oups").verify();
+        StepVerifier.create(mono).expectErrorMessage("TO_REPLACE").verify();
     }
 
     @Test
@@ -25,7 +25,7 @@ public class ErrorsTest {
                 })
                 .doOnNext(x -> System.out.println("2 - is it Called ?"));
 
-        StepVerifier.create(mono).expectErrorMessage("Oups").verify();
+        StepVerifier.create(mono).expectErrorMessage("TO_REPLACE").verify();
     }
 
 

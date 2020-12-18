@@ -26,7 +26,8 @@ public class SubscriptionTest {
 
     @Test
     public void subscriptionWithSubscribe() {
-        Mono.fromCallable(() -> atomicInteger.addAndGet(1)).subscribe();
+        Mono.fromCallable(() -> atomicInteger.addAndGet(1))
+                .subscribe();
 
         assertTrue(atomicInteger.get() == TO_REPLACE);
     }
